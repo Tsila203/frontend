@@ -1,23 +1,36 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useState } from 'react';
 
 function App() {
+  const [review, setReview] = useState('');
+  const [result, setResult] = useState('');
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const response = await fetch('http://localhost:5000/predict', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ review }),
+    });
+    const data = await response.json();
+    setResult(data.sentiment);
+  };
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <h1>Sentiment Analysis</h1>
+      <form onSubmit={handleSubmit}>
+        <textarea
+          value={review}
+          onChange={(e) => setReview(e.target.value)}
+          rows="4"
+          cols="50"
+        />
+        <br />
+        <button type="submit">Analyze</button>
+      </form>
+      {result && <h2>Sentiment: {result}</h2>}
     </div>
   );
 }
